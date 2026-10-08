@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FitBuddy | Your Plan</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <a class="brand" href="/">FitBuddy</a>
+      <a class="btn secondary" href="/">New Plan</a>
+    </header>
+
+    {% if message %}<div class="alert success">{{ message }}</div>{% endif %}
+    {% if error %}<div class="alert error">{{ error }}</div>{% endif %}
+
+    {% if user %}
+    <section class="card profile">
+      <div>
+        <div class="badge">PERSONALIZED PLAN</div>
+        <h1>Hello, {{ user.username }}!</h1>
+        <p>Your plan is tailored to your selected goal and intensity.</p>
+      </div>
+      <div class="profile-grid">
+        <span><b>User ID</b>{{ user.user_id }}</span>
+        <span><b>Age</b>{{ user.age }}</span>
+        <span><b>Weight</b>{{ user.weight }} kg</span>
+        <span><b>Goal</b>{{ user.goal }}</span>
+        <span><b>Intensity</b>{{ user.intensity }}</span>
+      </div>
+    </section>
+
+    {% if plan %}
+    <section>
+      <div class="section-title">
+        <h2>{{ "Updated 7-Day Workout Plan" if is_updated else "Your 7-Day Workout Plan" }}</h2>
+        {% if is_updated %}<span class="badge">UPDATED</span>{% endif %}
+      </div>
+
+      <div class="days">
+        {% for day in plan.days %}
+        <article class="card day">
+          <div class="day-head">
+            <div><span class="day-number">{{ loop.index }}</span><h3>{{ day.day }}</h3></div>
+            <span class="focus">{{ day.focus }}</span>
+          </div>
+          <p><b>Warm-up:</b> {{ day.warm_up }}</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Exercise</th><th>Sets / Reps</th><th>Rest</th><th>Notes</th></tr></thead>
+              <tbody>
+              {% for ex in day.exercises %}
+                <tr><td>{{ ex.name }}</td><td>{{ ex.sets_reps }}</td><td>{{ ex.rest }}</td><td>{{ ex.notes }}</td></tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p><b>Cooldown:</b> {{ day.cooldown }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card tip">
+      <h2>Nutrition / Recovery Tip</h2>
+      <p>{{ nutrition_tip }}</p>
+    </section>
+
+    <section class="card feedback">
+      <div class="section-title"><h2>Improve This Plan</h2><span class="badge">AI FEEDBACK</span></div>
+      <p>Tell FitBuddy what you want changed, such as more cardio, fewer exercises, or an extra recovery day.</p>
+      <form method="post" action="/submit-feedback">
+        <input type="hidden" name="user_id" value="{{ user.user_id }}">
+        <textarea name="feedback" required minlength="5" maxlength="1000" placeholder="Example: Add more cardio and keep Friday as a recovery day."></textarea>
+        <button class="btn primary" type="submit">Update Plan with AI</button>
+      </form>
+      {% if feedback %}<p class="small-note"><b>Latest feedback:</b> {{ feedback }}</p>{% endif %}
+    </section>
+    {% endif %}
+    {% endif %}
+  </main>
+</body>
+</html>

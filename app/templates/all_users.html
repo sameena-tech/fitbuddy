@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FitBuddy | All Users</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <div><div class="badge">ADMIN DASHBOARD</div><h1>All Users</h1></div>
+      <a class="btn secondary" href="/">Home</a>
+    </header>
+
+    {% if rows %}
+    <div class="table-wrap card">
+      <table class="admin-table">
+        <thead>
+          <tr><th>User</th><th>Profile</th><th>Goal</th><th>Original Plan</th><th>Updated Plan</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+        {% for user, plan in rows %}
+          <tr>
+            <td><b>{{ user.username }}</b><br><span class="muted">{{ user.user_id }}</span></td>
+            <td>{{ user.age }} yrs<br>{{ user.weight }} kg<br>{{ user.intensity }}</td>
+            <td>{{ user.goal }}</td>
+            <td>{% if plan %}<pre>{{ plan.original_plan }}</pre>{% else %}-{% endif %}</td>
+            <td>{% if plan and plan.updated_plan %}<pre>{{ plan.updated_plan }}</pre>{% else %}<span class="muted">No update</span>{% endif %}</td>
+            <td>
+              <form method="post" action="/admin/delete-user" onsubmit="return confirm('Delete this user and plan?');">
+                <input type="hidden" name="user_id" value="{{ user.user_id }}">
+                <input type="hidden" name="admin_token" value="{{ admin_token }}">
+                <button class="btn danger" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <section class="card"><h2>No users yet</h2><p>Generate a plan from the home page to create the first record.</p></section>
+    {% endif %}
+  </main>
+</body>
+</html>
